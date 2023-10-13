@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.students.MessageMapper">
+    <select id="queryAllMessage" parameterType="String" resultType="com.lcw.exerciseback.domain.query.MessageQuery">
+        SELECT
+            messageID,studentID,testsID,teacherName,message_quick.messageQuickHead,message_quick.messageQuickContent,messageReleaseTime,isCheck
+        FROM
+            message,message_quick,teachers
+        WHERE
+            message.teacherID=teachers.teacherID
+          AND
+            message.messageQuickID=message_quick.messageQuickID
+          AND
+            studentID=#{studentID}
+        ORDER BY
+            messageReleaseTime
+            DESC
+    </select>
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.teachers.ForumsMapper">
+    <select id="queryAllForums" parameterType="String" resultType="com.lcw.exerciseback.domain.entity.ForumEntity">
+        SELECT
+            forums.forumID AS 'forumID',
+            forums.forumName AS 'forumName',
+            forums.forumContent AS 'forumContent',
+            forums.forumFigureCaptions AS 'forumFigureCaptions',
+            forums.forumPicture AS 'forumPicture',
+            forums.forumLikeNumber AS 'forumLikeNumber',
+            forums.forumReadNumber AS 'forumReadNumber',
+            forums.forumTime AS 'forumTime',
+            teachers.teacherName AS 'teacherName'
+        FROM
+            forums,teachers
+        WHERE
+            forums.teacherID = teachers.teacherID
+            AND
+            forums.teacherID = #{teacherID}
+        ORDER BY
+            forums.forumTime
+            DESC
+    </select>
+    <select id="queryAllForumsByLike" parameterType="String" resultType="com.lcw.exerciseback.domain.entity.ForumEntity">
+        SELECT
+            forums.forumID AS 'forumID',
+            forums.forumName AS 'forumName',
+            forums.forumContent AS 'forumContent',
+            forums.forumFigureCaptions AS 'forumFigureCaptions',
+            forums.forumPicture AS 'forumPicture',
+            forums.forumLikeNumber AS 'forumLikeNumber',
+            forums.forumReadNumber AS 'forumReadNumber',
+            forums.forumTime AS 'forumTime',
+            teachers.teacherName AS 'teacherName'
+        FROM
+            forums,teachers
+        WHERE
+            forums.teacherID = teachers.teacherID
+          AND
+            forums.teacherID = #{teacherID}
+        ORDER BY
+            forums.forumLikeNumber
+            DESC
+    </select>
+    <select id="queryAllForumsByRead" parameterType="String" resultType="com.lcw.exerciseback.domain.entity.ForumEntity">
+        SELECT
+            forums.forumID AS 'forumID',
+            forums.forumName AS 'forumName',
+            forums.forumContent AS 'forumContent',
+            forums.forumFigureCaptions AS 'forumFigureCaptions',
+            forums.forumPicture AS 'forumPicture',
+            forums.forumLikeNumber AS 'forumLikeNumber',
+            forums.forumReadNumber AS 'forumReadNumber',
+            forums.forumTime AS 'forumTime',
+            teachers.teacherName AS 'teacherName'
+        FROM
+            forums,teachers
+        WHERE
+            forums.teacherID = teachers.teacherID
+          AND
+            forums.teacherID = #{teacherID}
+        ORDER BY
+            forums.forumReadNumber
+            DESC
+    </select>
+    <select id="queryAllForumsByTime" parameterType="String" resultType="com.lcw.exerciseback.domain.entity.ForumEntity">
+        SELECT
+            forums.forumID AS 'forumID',
+            forums.forumName AS 'forumName',
+            forums.forumContent AS 'forumContent',
+            forums.forumFigureCaptions AS 'forumFigureCaptions',
+            forums.forumPicture AS 'forumPicture',
+            forums.forumLikeNumber AS 'forumLikeNumber',
+            forums.forumReadNumber AS 'forumReadNumber',
+            forums.forumTime AS 'forumTime',
+            teachers.teacherName AS 'teacherName'
+        FROM
+            forums,teachers
+        WHERE
+            forums.teacherID = teachers.teacherID
+          AND
+            forums.teacherID = #{teacherID}
+        ORDER BY
+            forums.forumTime
+            ASC
+    </select>
+    <select id="queryAllForumsByKeyWord" parameterType="com.lcw.exerciseback.domain.query.TypeAndTeaQuery" resultType="com.lcw.exerciseback.domain.entity.ForumEntity">
+        SELECT
+            forums.forumID AS 'forumID',
+            forums.forumName AS 'forumName',
+            forums.forumContent AS 'forumContent',
+            forums.forumFigureCaptions AS 'forumFigureCaptions',
+            forums.forumPicture AS 'forumPicture',
+            forums.forumLikeNumber AS 'forumLikeNumber',
+            forums.forumReadNumber AS 'forumReadNumber',
+            forums.forumTime AS 'forumTime',
+            teachers.teacherName AS 'teacherName'
+        FROM
+            forums,teachers
+        WHERE
+            forums.teacherID = teachers.teacherID
+          AND
+            forums.teacherID = #{teacherID}
+        <if test="keyWord != null and keyWord != ''">
+            AND
+            forums.forumName LIKE concat('%',trim(#{keyWord}),'%')
+        </if>
+        ORDER BY
+            forums.forumTime
+            DESC
+    </select>
+</mapper>

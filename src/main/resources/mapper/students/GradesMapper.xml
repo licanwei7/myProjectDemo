@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.students.GradesMapper">
+    <select id="queryAllGradesByStudentID" parameterType="String" resultType="com.lcw.exerciseback.domain.query.GradesQuery">
+        SELECT
+            studentID,grades.testsID,tests.testsName,test_types.testTypesName,choiceQuestionScore,subjectiveTopicScore,totalScore,examEndTime,residueHeavyBatchNumber,isHeavyBatching,teachers.teacherName
+        FROM
+            grades,tests,test_types,teachers
+        WHERE
+            grades.testsID=tests.testsID
+            AND
+            tests.teacherID=teachers.teacherID
+            AND
+            tests.testTypesID=test_types.testTypesID
+        <if test="studentID != null and studentID != ''">
+            AND
+            grades.studentID=#{studentID}
+        </if>
+        ORDER BY
+            examEndTime
+            DESC
+    </select>
+    <select id="queryAllGradesBySIDandTID" parameterType="com.lcw.exerciseback.domain.dpo.QueryGradesBySandT" resultType="com.lcw.exerciseback.domain.query.GradesQuery">
+        SELECT
+            studentID,grades.testsID,tests.testsName,test_types.testTypesName,choiceQuestionScore,subjectiveTopicScore,totalScore,examEndTime,residueHeavyBatchNumber,isHeavyBatching,teachers.teacherName
+        FROM
+            grades,tests,test_types,teachers
+        WHERE
+            grades.testsID=tests.testsID
+            AND
+            tests.testTypesID=test_types.testTypesID
+            AND
+                grades.teacherID=teachers.teacherID
+        <if test="testTypesID != null and testTypesID != 0">
+            AND
+            tests.testTypesID=#{testTypesID}
+        </if>
+        <if test="studentID != null and studentID != ''">
+            AND
+            grades.studentID=#{studentID}
+        </if>
+        ORDER BY
+            examEndTime
+            DESC
+    </select>
+    <select id="queryAllGradesByKeyWord" parameterType="com.lcw.exerciseback.domain.dpo.QueryGradesBySandK" resultType="com.lcw.exerciseback.domain.query.GradesQuery">
+        SELECT
+            studentID,grades.testsID,tests.testsName,test_types.testTypesName,choiceQuestionScore,subjectiveTopicScore,totalScore,examEndTime,residueHeavyBatchNumber,isHeavyBatching,teacherName
+        FROM
+            grades,tests,test_types,teachers
+        WHERE
+            grades.testsID=tests.testsID
+            AND
+            tests.testTypesID=test_types.testTypesID
+          AND
+              tests.teacherID=teachers.teacherID
+        <if test="studentID != null and studentID != ''">
+            AND
+            grades.studentID=#{studentID}
+        </if>
+        <if test="keyWord != null and keyWord != ''">
+            AND
+            tests.testsName LIKE concat('%',trim(#{keyWord}),'%')
+        </if>
+        ORDER BY
+            examEndTime
+            DESC
+    </select>
+    <!--根据学生ID和测试ID将isHeavyBatching属性从0->1-->
+    <update id="transHB" parameterType="com.lcw.exerciseback.domain.dto.TestAndStu">
+        UPDATE
+            grades
+        SET
+            grades.isHeavyBatching=1
+        WHERE
+            grades.studentID=#{studentID}
+          AND
+            grades.testsID=#{testID}
+    </update>
+    <!--查询所有测试类型-->
+    <select id="queryAllTestsTypes" resultType="com.lcw.exerciseback.domain.entity.TestTypes">
+        SELECT
+            test_types.testTypesID,test_types.testTypesName
+        FROM
+            `test_types`
+    </select>
+    <select id="queryRhbNum" resultType="Integer" parameterType="com.lcw.exerciseback.domain.dto.TestAndStu">
+        SELECT
+            grades.residueHeavyBatchNumber
+        FROM
+            `grades`
+        WHERE
+            grades.studentID=#{studentID}
+          AND
+            grades.testsID=#{testID}
+    </select>
+    <update id="updateRhbNum" parameterType="com.lcw.exerciseback.domain.dto.TestAndStu">
+        UPDATE
+            grades
+        SET
+            grades.residueHeavyBatchNumber = #{rhbNum}
+        WHERE
+            grades.studentID= #{studentID}
+          AND
+            grades.testsID= #{testID}
+    </update>
+</mapper>

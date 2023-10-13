@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.students.EvaluateMapper">
+    <select id="queryTestCompleteByStudentID" resultType="int" parameterType="String">
+        SELECT
+               testsID
+        FROM
+             test_complete
+        WHERE
+              studentID=#{studentID}
+          AND
+              isComplete=0
+        ORDER BY
+                 testsID
+                  DESC
+    </select>
+    <select id="queryAllTestByStudentID" parameterType="String" resultType="com.lcw.exerciseback.domain.query.EvaluateQuery">
+        SELECT
+            tests.testsID,teacherName,testsName,testTypesName,testsMaxTime,testsCover
+        FROM
+            tests,teachers,test_types,test_complete
+        WHERE
+            tests.teacherID=teachers.teacherID
+          AND
+            tests.testTypesID=test_types.testTypesID
+          AND
+            tests.testsID=test_complete.testID
+          AND
+            test_complete.isComplete=0
+          AND
+            test_complete.studentID=#{studentID}
+        ORDER BY
+            testsID
+            DESC
+    </select>
+    <!--1.根据测试ID查询该测试所包含内容，目前只涉及到单选-->
+    <select id="queryThisTest" resultType="com.lcw.exerciseback.domain.query.TestQuery" parameterType="Integer">
+        SELECT
+            tests.testsID AS 'testID',
+            teachers.teacherName AS 'teacherName',
+            tests.testsName AS 'testName',
+            test_types.testTypesName AS 'testTypesName',
+            tests.testsMaxTime AS 'testsMaxTime',
+            test_levels.testLevelsName AS 'testLevelsName',
+            tests.createTime AS 'createTime'
+        FROM
+            tests,teachers,test_levels,test_types
+        WHERE
+            tests.testsID = #{testID}
+          AND
+            tests.teacherID=teachers.teacherID
+          AND
+            tests.testTypesID=test_types.testTypesID
+          AND
+            tests.testsLevelID=test_levels.testLevelsID
+    </select>
+    <!--2.根据测试ID查询该测试所包含内容，目前只涉及到单选-->
+    <select id="queryThisTestRadio" resultType="com.lcw.exerciseback.domain.entity.ChoiceQuestionsEntity" parameterType="Integer">
+        SELECT
+            choice_questions.choiceQuestionsID AS 'choiceQuestionsID',
+            choice_questions.questionsTypesID AS 'questionsTypesID',
+            choice_questions.questionsDifficultyID AS 'questionsDifficultyID',
+            choice_questions.choiceQuestionName AS 'choiceQuestionName',
+            choice_questions.choiceQuestionA AS 'choiceQuestionA',
+            choice_questions.choiceQuestionB AS 'choiceQuestionB',
+            choice_questions.choiceQuestionC AS 'choiceQuestionC',
+            choice_questions.choiceQuestionD AS 'choiceQuestionD',
+            choice_questions.choiceQuestionRightAnswer AS 'choiceQuestionRightAnswer',
+            choice_questions.choiceQuestionAnalysis AS 'choiceQuestionAnalysis'
+        FROM
+            test_radio,
+            choice_questions
+        WHERE
+            test_radio.testID = #{testID}
+          AND test_radio.radioID = choice_questions.choiceQuestionsID
+    </select>
+    <update id="updateTestComplete" parameterType="com.lcw.exerciseback.domain.dpo.EvaluateOperation">
+        UPDATE
+            test_complete
+        SET
+            test_complete.isComplete=1
+        WHERE
+            test_complete.studentID=#{studentID}
+          AND
+            test_complete.testID=#{testID}
+    </update>
+    <insert id="addTestRecords" parameterType="com.lcw.exerciseback.domain.dpo.EvaluateOperation">
+        INSERT INTO test_record ( test_record.testID, test_record.studentID, test_record.radioRecord )
+        VALUES(
+            #{testID},
+            #{studentID},
+            #{radioAnswers})
+    </insert>
+    <select id="queryAnswers" parameterType="Integer" resultType="String">
+        SELECT
+            choice_questions.choiceQuestionRightAnswer
+        FROM
+            `tests`,choice_questions,test_radio
+        WHERE
+            test_radio.testID=tests.testsID
+          AND
+            test_radio.radioID=choice_questions.choiceQuestionsID
+          AND
+            test_radio.testID=#{testID}
+    </select>
+    <insert id="addStuGrade" parameterType="com.lcw.exerciseback.domain.entity.GradesEntity">
+        INSERT INTO grades (
+            grades.studentID,
+            grades.testsID,
+            grades.choiceQuestionScore,
+            grades.subjectiveTopicScore,
+            grades.totalScore,
+            grades.examEndTime,
+            grades.residueHeavyBatchNumber,
+            grades.isHeavyBatching,
+            grades.teacherID
+        )
+        VALUES
+        (#{studentID},#{testsID},#{choiceQuestionScore},#{subjectiveTopicScore},#{totalScore},NOW(),#{ResidueHeavyBatchNumber},#{isHeavyBatching},#{teacherID})
+    </insert>
+    <insert id="addStuMessage" parameterType="com.lcw.exerciseback.domain.entity.MessageEntity">
+        INSERT INTO
+            message(message.studentID,message.testsID,message.messageQuickID,message.teacherID,message.messageReleaseTime,message.isCheck)
+        VALUES
+            (#{studentID},#{testsID},#{messageQuickId},#{teacherID},NOW(),#{isCheck})
+    </insert>
+    <select id="queryTeaByStu" parameterType="String" resultType="String">
+        SELECT
+            students.teacherID
+        FROM
+            `students`
+        WHERE
+            students.studentID=#{studentID}
+    </select>
+</mapper>

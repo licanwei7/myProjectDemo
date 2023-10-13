@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.teachers.ReprintMapper">
+    <!--查询所有该教师的所有学生成绩列表-->
+    <select id="queryAllStuGrades" resultType="com.lcw.exerciseback.domain.query.GradesQuery" parameterType="String">
+        SELECT
+            grades.studentID AS studentID,grades.testsID AS testsID,students.studentName AS studentName,tests.testsName AS testsName,
+            test_types.testTypesName AS testTypesName,test_levels.testLevelsName AS testLevelsName,grades.choiceQuestionScore AS choiceQuestionScore,
+            grades.totalScore AS totalScore,grades.examEndTime AS examEndTime,grades.residueHeavyBatchNumber AS ResidueHeavyBatchNumber,grades.isHeavyBatching AS isHeavyBatching
+        FROM
+            grades,students,test_levels,test_types,tests
+        WHERE
+            grades.studentID=students.studentID
+          AND
+            grades.testsID=tests.testsID
+          AND
+            test_levels.testLevelsID=tests.testsLevelID
+          AND
+            test_types.testTypesID=tests.testTypesID
+          AND
+            tests.teacherID=#{teacherID}
+        ORDER BY
+            grades.isHeavyBatching
+            DESC,
+            grades.examEndTime
+            DESC
+    </select>
+    <select id="queryAllTestsName" resultType="com.lcw.exerciseback.domain.query.TeaTestNamesQuery" parameterType="String">
+        SELECT
+            tests.testsID AS 'testID',
+            tests.testsName AS 'testName'
+        FROM
+            `tests`
+        WHERE
+            tests.teacherID=#{teacherID}
+    </select>
+    <select id="queryAllStuGradesByTestID" parameterType="com.lcw.exerciseback.domain.query.TestAndTeaQuery" resultType="com.lcw.exerciseback.domain.query.GradesQuery">
+        SELECT
+            grades.studentID AS studentID,grades.testsID AS testsID,students.studentName AS studentName,tests.testsName AS testsName,
+            test_types.testTypesName AS testTypesName,test_levels.testLevelsName AS testLevelsName,grades.choiceQuestionScore AS choiceQuestionScore,
+            grades.totalScore AS totalScore,grades.examEndTime AS examEndTime,grades.residueHeavyBatchNumber AS ResidueHeavyBatchNumber,grades.isHeavyBatching AS isHeavyBatching
+        FROM
+            grades,students,test_levels,test_types,tests
+        WHERE
+            grades.studentID=students.studentID
+          AND
+            test_levels.testLevelsID=tests.testsLevelID
+          AND
+            test_types.testTypesID=tests.testTypesID
+        <if test="testID != null and testID != 0">
+            AND
+            tests.testsID=#{testID}
+        </if>
+        AND
+        grades.testsID=tests.testsID
+          AND
+            tests.teacherID=#{teacherID}
+        ORDER BY
+            grades.isHeavyBatching
+            DESC,
+            grades.examEndTime
+            DESC
+    </select>
+    <select id="queryAllStuGradesByStu" resultType="com.lcw.exerciseback.domain.query.GradesQuery" parameterType="String">
+        SELECT
+            grades.studentID AS studentID,grades.testsID AS testsID,students.studentName AS studentName,tests.testsName AS testsName,
+            test_types.testTypesName AS testTypesName,test_levels.testLevelsName AS testLevelsName,grades.choiceQuestionScore AS choiceQuestionScore,
+            grades.totalScore AS totalScore,grades.examEndTime AS examEndTime,grades.residueHeavyBatchNumber AS ResidueHeavyBatchNumber,grades.isHeavyBatching AS isHeavyBatching
+        FROM
+            grades,students,test_levels,test_types,tests
+        WHERE
+            grades.studentID=students.studentID
+          AND
+            grades.testsID=tests.testsID
+          AND
+            test_levels.testLevelsID=tests.testsLevelID
+          AND
+            test_types.testTypesID=tests.testTypesID
+        <if test="keyWord != null and keyWord != ''">
+            AND
+            students.studentName LIKE concat('%',trim(#{keyWord}),'%')
+        </if>
+          AND
+            tests.teacherID=#{teacherID}
+        ORDER BY
+            grades.isHeavyBatching
+            DESC,
+            grades.examEndTime
+            DESC
+    </select>
+    <select id="queryAnswer" parameterType="com.lcw.exerciseback.domain.dpo.TeaAndStu" resultType="String">
+        SELECT test_record.radioRecord FROM `test_record` WHERE test_record.testID =#{testID} AND test_record.studentID = #{studentID}
+    </select>
+    <update id="updateStuGrades" parameterType="com.lcw.exerciseback.domain.dpo.UpdateStuGrade">
+        UPDATE
+            grades
+        SET
+            grades.totalScore = #{totalScore},
+            grades.isHeavyBatching=0
+        WHERE
+            grades.testsID = #{testsID}
+          AND
+            grades.studentID = #{studentID}
+    </update>
+    <select id="queryHBNumber" parameterType="com.lcw.exerciseback.domain.dpo.UpdateStuGrade" resultType="Integer">
+        SELECT
+            grades.residueHeavyBatchNumber
+        FROM
+            grades
+        WHERE
+            grades.studentID=#{studentID}
+          AND
+            grades.testsID=#{testsID}
+    </select>
+</mapper>

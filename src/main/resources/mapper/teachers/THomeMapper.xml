@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.teachers.THomeMapper">
+    <!--查询近两次该教师发布测试信息-->
+    <select id="queryTwoTests" resultType="Integer" parameterType="String">
+        SELECT
+            tests.testsID
+        FROM
+            tests
+        WHERE
+            tests.teacherID=#{teacherID}
+        ORDER BY
+            tests.createTime
+            DESC
+            LIMIT 2
+    </select>
+    <!--根据测试ID拿到测试完成情况-->
+    <select id="queryTestSituation" resultType="com.lcw.exerciseback.domain.dto.TestSituation">
+        SELECT
+            COUNT(test_complete.isComplete='0' or NULL) AS unfinishNum,
+            COUNT(test_complete.isComplete='1' or NULL) AS finishNum
+        FROM
+            `test_complete`
+        WHERE
+            test_complete.testID=#{testID}
+    </select>
+    <!--根据测试查询各个分数阶段人数-->
+    <select id="queryEachPhaseNum" resultType="com.lcw.exerciseback.domain.dto.GradesSituation" parameterType="Integer">
+        SELECT
+            sum(grades.totalScore between 0 and 49) As 'lowFiftyNum',
+            sum(grades.totalScore between 50 and 59) As 'fiftyAndSixtyNum',
+            sum(grades.totalScore between 60 and 69) As 'sixtyAndSeventyNum',
+            sum(grades.totalScore between 70 and 79) As 'seventyAndEightyNum',
+            sum(grades.totalScore between 80 and 89) As 'EightyAndNinetyNum',
+            sum(grades.totalScore between 90 and 100) As 'ninetyAndHundredNum'
+        FROM
+            grades
+        WHERE
+            grades.testsID=#{testID}
+    </select>
+</mapper>

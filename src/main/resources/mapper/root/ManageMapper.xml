@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.root.ManageMapper">
+    <select id="queryAllStu" resultType="com.lcw.exerciseback.domain.query.MangeStuQuery">
+        SELECT
+            students.studentID,students.studentPwd,students.studentName,students.studentSex,students.studentEmail,students.studentNickName,students.studentHeadPortrait,teachers.teacherName
+        FROM
+            students,teachers
+        WHERE
+            students.teacherID=teachers.teacherID
+          AND
+            students.studentID!=0
+    </select>
+    <select id="queryAllTea" resultType="com.lcw.exerciseback.domain.query.MangeTeaQuery">
+        SELECT * FROM `teachers`
+    </select>
+    <select id="queryAdmin" parameterType="String" resultType="String">
+        SELECT
+            system_admin.systemID
+        FROM
+            system_admin
+        WHERE
+            system_admin.systemID=#{systemID}
+          AND
+            system_admin.systemPwd=#{systemPwd}
+    </select>
+    <select id="queryStuByInfo" parameterType="String" resultType="com.lcw.exerciseback.domain.query.MangeStuQuery">
+        SELECT
+            students.studentID AS 'studentID',
+            students.studentPwd AS 'studentPwd',
+            students.studentName AS 'studentName',
+            students.studentSex AS 'studentNickName',
+            students.studentEmail AS 'studentEmail',
+            students.studentHeadPortrait AS 'studentHeadPortrait',
+            teachers.teacherName AS 'teacherName'
+        FROM
+            students,teachers
+        WHERE
+            students.teacherID=teachers.teacherID
+        <if test="info != null and info != ''">
+            AND
+            students.studentID LIKE concat('%',trim(#{info}),'%')
+            OR
+            students.studentName LIKE concat('%',trim(#{info}),'%')
+        </if>
+    </select>
+    <select id="queryStuByTea" parameterType="String" resultType="com.lcw.exerciseback.domain.query.MangeStuQuery">
+        SELECT
+        students.studentID AS 'studentID',
+        students.studentPwd AS 'studentPwd',
+        students.studentName AS 'studentName',
+        students.studentSex AS 'studentNickName',
+        students.studentEmail AS 'studentEmail',
+        students.studentHeadPortrait AS 'studentHeadPortrait',
+        teachers.teacherName AS 'teacherName'
+        FROM
+        students,teachers
+        WHERE
+        students.teacherID=teachers.teacherID
+        <if test="teaName != null and teaName != ''">
+            AND
+            teachers.teacherName LIKE concat('%',trim(#{teaName}),'%')
+        </if>
+    </select>
+    <insert id="addStu" parameterType="com.lcw.exerciseback.domain.entity.StudentEntity">
+        INSERT INTO students (
+            students.studentID,
+            students.studentPwd,
+            students.studentName,
+            students.studentSex,
+            students.studentEmail,
+            students.teacherID
+        )
+        VALUES
+        (#{studentID},
+         #{studentPwd},
+         #{studentName},
+         #{studentSex},
+         #{studentEmail},
+         #{teacherID}
+        )
+    </insert>
+    <delete id="deleteStu" parameterType="String">
+        delete from students where  students.studentID = #{studentID}
+    </delete>
+    <select id="queryStuByID" parameterType="String" resultType="com.lcw.exerciseback.domain.query.MangeStuQuery">
+        SELECT
+            students.studentID,students.studentPwd,students.studentName,students.studentSex,students.studentEmail,students.studentNickName,students.studentHeadPortrait, students.teacherID
+        FROM
+            students
+        WHERE
+            students.studentID!=0
+          AND
+            students.studentID = #{studentID}
+    </select>
+    <insert id="updateStu" parameterType="com.lcw.exerciseback.domain.entity.StudentEntity">
+        UPDATE students
+        SET
+            students.studentName = #{studentName},
+            students.studentPwd = #{studentPwd},
+            students.studentSex = #{studentSex},
+            students.studentEmail = #{studentEmail}
+        WHERE
+            students.studentID = #{studentID}
+    </insert>
+    <select id="queryTeaByInfo" parameterType="String" resultType="com.lcw.exerciseback.domain.query.MangeTeaQuery">
+        SELECT * FROM `teachers`
+        WHERE
+        1=1
+        <if test="info != null and info != ''">
+            AND
+            teachers.teacherName LIKE concat('%',trim(#{info}),'%')
+            OR
+            teachers.teacherID LIKE concat('%',trim(#{info}),'%')
+        </if>
+    </select>
+    <insert id="addTea" parameterType="com.lcw.exerciseback.domain.entity.TeacherEntity">
+        INSERT INTO
+            teachers(
+            teachers.teacherID,
+            teachers.teacherPwd,
+            teachers.teacherName,
+            teachers.teacherSex,
+            teachers.teacherEmail,
+            teachers.teacherHeadPortrait,
+            teachers.mangeClass
+        )
+        VALUES
+        (
+            #{teacherID},
+            #{teacherPwd},
+            #{teacherName},
+            #{teacherSex},
+            #{teacherEmail},
+            null,
+            #{mangeClass}
+        )
+    </insert>
+    <select id="queryTeaByID" parameterType="String" resultType="com.lcw.exerciseback.domain.query.MangeTeaQuery">
+        SELECT * FROM `teachers` where teachers.teacherID = #{teacherID}
+    </select>
+    <update id="updateTea" parameterType="com.lcw.exerciseback.domain.entity.TeacherEntity">
+        UPDATE teachers
+        SET
+            teachers.teacherName = #{teacherName},
+            teachers.teacherPwd = #{teacherPwd},
+            teachers.teacherSex = #{teacherSex},
+            teachers.teacherEmail = #{teacherEmail},
+            teachers.mangeClass = #{mangeClass}
+        WHERE
+             teachers.teacherID = #{teacherID}
+    </update>
+    <delete id="deleteTeaByID" parameterType="String">
+        delete from teachers where  teachers.teacherID = #{teacherID}
+    </delete>
+</mapper>

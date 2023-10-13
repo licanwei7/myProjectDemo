@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.students.SHomeMapper">
+    <select id="queryAllForums" resultType="com.lcw.exerciseback.domain.entity.ForumEntity">
+        select
+            forumID,forumName,forumContent,forumFigureCaptions,forumPicture,forumLikeNumber,forumReadNumber,forumTime
+        from
+             forums
+        ORDER BY
+            forumTime
+            DESC
+    </select>
+    <select id="queryForumsTop" resultType="com.lcw.exerciseback.domain.query.ForumsTopQuery">
+        select
+            forumID,forumName,forumContent,forumReadNumber
+        from
+            forums
+        ORDER BY
+            forumReadNumber
+            DESC
+            limit 9
+    </select>
+    <select id="queryAllForumTypes" resultType="com.lcw.exerciseback.domain.entity.ForumTypesEntity">
+        select
+            forumTypeID,forumTypeName
+        from
+            forum_types
+        ORDER BY
+            forumTypeID
+            ASC
+    </select>
+    
+    <!--测试上传图片-->
+    <insert id="addPhoto">
+        insert into forums (forumContent,forumFigureCaptions) values ("222",#{photo})
+    </insert>
+    <!--测试上传图片-->
+    <insert id="addString" parameterType="String">
+        insert into forums (forumContent,forumFigureCaptions) values ("1",#{str})
+    </insert>
+</mapper>

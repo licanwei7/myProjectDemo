@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.teachers.TopicsMapper">
+    <!--展示所有题库题目（按ID倒叙）-->
+    <select id="showAllTopics" resultType="com.lcw.exerciseback.domain.query.TopicsQuery">
+        SELECT
+            choiceQuestionsID AS topicID,choiceQuestionName AS topicName,questionsTypesName AS topicType,
+            questionsDifficultyName AS topicLevel,choiceQuestionA AS optionA,choiceQuestionB AS optionB,
+            choiceQuestionC AS optionC,choiceQuestionD AS optionD,choiceQuestionRightAnswer AS rightOption,
+            choiceQuestionAnalysis AS analysis
+        FROM
+            choice_questions,questions_types,questions_difficulty
+        WHERE
+                choice_questions.questionsDifficultyID=questions_difficulty.questionsDifficultyID
+          AND
+            choice_questions.questionsTypesID=questions_types.questionsTypesID
+        ORDER BY
+            topicID
+            DESC
+    </select>
+    <select id="queryTopicsByTypeID" resultType="com.lcw.exerciseback.domain.query.TopicsQuery" parameterType="Integer">
+        SELECT
+            choiceQuestionsID AS topicID,choiceQuestionName AS topicName,questionsTypesName AS topicType,
+            questionsDifficultyName AS topicLevel,choiceQuestionA AS optionA,choiceQuestionB AS optionB,
+            choiceQuestionC AS optionC,choiceQuestionD AS optionD,choiceQuestionRightAnswer AS rightOption,
+            choiceQuestionAnalysis AS analysis
+        FROM
+            choice_questions,questions_types,questions_difficulty
+        WHERE
+                choice_questions.questionsDifficultyID=questions_difficulty.questionsDifficultyID
+          AND
+            choice_questions.questionsTypesID=questions_types.questionsTypesID
+        <if test="typeID != null and typeID != 0">
+            AND
+            choice_questions.questionsTypesID=#{typeID}
+        </if>
+        ORDER BY
+            topicID
+            DESC
+    </select>
+    <select id="queryTopicsByKeyWord" parameterType="String" resultType="com.lcw.exerciseback.domain.query.TopicsQuery">
+        SELECT
+            choiceQuestionsID AS topicID,choiceQuestionName AS topicName,questionsTypesName AS topicType,
+            questionsDifficultyName AS topicLevel,choiceQuestionA AS optionA,choiceQuestionB AS optionB,
+            choiceQuestionC AS optionC,choiceQuestionD AS optionD,choiceQuestionRightAnswer AS rightOption,
+            choiceQuestionAnalysis AS analysis
+        FROM
+            choice_questions,questions_types,questions_difficulty
+        WHERE
+                choice_questions.questionsDifficultyID=questions_difficulty.questionsDifficultyID
+          AND
+            choice_questions.questionsTypesID=questions_types.questionsTypesID
+        <if test="keyWord != null and keyWord != ''">
+            AND
+            choice_questions.choiceQuestionName LIKE concat('%',trim(#{keyWord}),'%')
+        </if>
+        ORDER BY
+            topicID
+            DESC
+    </select>
+    <insert id="addTopic" parameterType="com.lcw.exerciseback.domain.entity.ChoiceQuestionsEntity">
+        INSERT INTO choice_questions (
+            choice_questions.questionsTypesID,
+            choice_questions.questionsDifficultyID,
+            choice_questions.choiceQuestionName,
+            choice_questions.choiceQuestionA,
+            choice_questions.choiceQuestionB,
+            choice_questions.choiceQuestionC,
+            choice_questions.choiceQuestionD,
+            choice_questions.choiceQuestionRightAnswer,
+            choice_questions.choiceQuestionAnalysis
+        )
+        VALUES
+        (#{questionsTypesID},#{questionsDifficultyID},#{choiceQuestionName},#{choiceQuestionA},#{choiceQuestionB},#{choiceQuestionC},#{choiceQuestionD},#{choiceQuestionRightAnswer},#{choiceQuestionAnalysis})
+    </insert>
+    <select id="queryTopicByID" parameterType="Integer" resultType="com.lcw.exerciseback.domain.entity.ChoiceQuestionsEntity">
+        SELECT
+            choice_questions.questionsTypesID,choice_questions.questionsDifficultyID,choice_questions.choiceQuestionName,choice_questions.choiceQuestionA,choice_questions.choiceQuestionB,choice_questions.choiceQuestionC,choice_questions.choiceQuestionD,choice_questions.choiceQuestionRightAnswer,choice_questions.choiceQuestionAnalysis
+        FROM
+            `choice_questions`
+        WHERE
+            choice_questions.choiceQuestionsID=#{choiceQuestionsID}
+    </select>
+    <update id="updateThisTopic" parameterType="com.lcw.exerciseback.domain.entity.ChoiceQuestionsEntity">
+        UPDATE
+            choice_questions
+        SET
+            choice_questions.questionsTypesID=#{questionsTypesID},
+            choice_questions.questionsDifficultyID=#{questionsDifficultyID},
+            choice_questions.choiceQuestionName=#{choiceQuestionName},
+            choice_questions.choiceQuestionA=#{choiceQuestionA},
+            choice_questions.choiceQuestionB=#{choiceQuestionB},
+            choice_questions.choiceQuestionC=#{choiceQuestionC},
+            choice_questions.choiceQuestionD=#{choiceQuestionD},
+            choice_questions.choiceQuestionRightAnswer=#{choiceQuestionRightAnswer},
+            choice_questions.choiceQuestionAnalysis=#{choiceQuestionAnalysis}
+        WHERE
+            choice_questions.choiceQuestionsID=#{choiceQuestionsID}
+    </update>
+    <delete id="deleteThisTopic" parameterType="Integer">
+        DELETE from choice_questions where choiceQuestionsID=#{choiceQuestionsID};
+    </delete>
+</mapper>

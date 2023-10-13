@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lcw.exerciseback.mapper.students.BrushQuestionMapper">
+    <select id="queryPartChoiceQuestion" resultType="com.lcw.exerciseback.domain.query.ShowPartChoiceQuestionQuery">
+        select
+            choiceQuestionsID,choiceQuestionName,questionsTypesName,questionsDifficultyName
+        from
+            choice_questions AS Q,questions_difficulty AS Q_D,questions_types AS Q_T
+        where
+            Q.questionsDifficultyID=Q_D.questionsDifficultyID
+          AND
+            Q.questionsTypesID=Q_T.questionsTypesID
+        ORDER BY
+            choiceQuestionsID
+            ASC
+    </select>
+    <select id="queryAllQuestionsTypes" resultType="com.lcw.exerciseback.domain.entity.QuestionsTypesEntity">
+        select
+            questionsTypesID,questionsTypesName
+        from
+            questions_types
+          ORDER BY
+            questionsTypesID
+            ASC
+    </select>
+    <select id="queryAllQuestionsDifficulty" resultType="com.lcw.exerciseback.domain.entity.QuestionsDifficultyEntity">
+        select
+            questionsDifficultyID,questionsDifficultyName
+        from
+            questions_difficulty
+          ORDER BY
+            questionsDifficultyID
+            ASC
+    </select>
+    <select id="queryPartChoiceQuestionByquestionsTypesOrDifficultyID" parameterType="com.lcw.exerciseback.domain.dpo.QueryQuestionsByTandD" resultType="com.lcw.exerciseback.domain.query.ShowPartChoiceQuestionQuery">
+        select
+            choiceQuestionsID,choiceQuestionName,questionsTypesName,questionsDifficultyName
+        from
+            choice_questions AS Q,questions_difficulty AS Q_D,questions_types AS Q_T
+        WHERE
+            Q.questionsDifficultyID=Q_D.questionsDifficultyID
+          AND
+            Q.questionsTypesID=Q_T.questionsTypesID
+        <if test="questionsTypesID != null and questionsTypesID != 0">
+            AND
+            Q.questionsTypesID=#{questionsTypesID}
+        </if>
+        <if test="questionsDifficultyID != null and questionsDifficultyID != 0">
+            AND
+            Q.questionsDifficultyID=#{questionsDifficultyID}
+        </if>
+        ORDER BY
+            choiceQuestionsID
+            ASC
+    </select>
+    <select id="queryPartChoiceQuestionByKeyWord" parameterType="String" resultType="com.lcw.exerciseback.domain.query.ShowPartChoiceQuestionQuery">
+        select
+            choiceQuestionsID,choiceQuestionName,questionsTypesName,questionsDifficultyName
+        from
+            choice_questions AS Q,questions_difficulty AS Q_D,questions_types AS Q_T
+        WHERE
+            Q.questionsDifficultyID=Q_D.questionsDifficultyID
+          AND
+            Q.questionsTypesID=Q_T.questionsTypesID
+        <if test="keyWord != null and keyWord != ''">
+            AND
+            Q.choiceQuestionName LIKE concat('%',trim(#{keyWord}),'%')
+        </if>
+        ORDER BY
+            choiceQuestionsID
+            ASC
+    </select>
+    <!--根据题目ID查询该题目所有信息-->
+    <select id="queryThisTopic" parameterType="Integer" resultType="com.lcw.exerciseback.domain.query.TopicItemQuery">
+        SELECT
+            choice_questions.choiceQuestionsID AS 'topicId',
+            questions_types.questionsTypesName AS 'topicType',
+            questions_difficulty.questionsDifficultyName AS 'topicLevel',
+            choice_questions.choiceQuestionName AS 'topicName',
+            choice_questions.choiceQuestionA AS 'optionA',
+            choice_questions.choiceQuestionB AS 'optionB',
+            choice_questions.choiceQuestionC AS 'optionC',
+            choice_questions.choiceQuestionD AS 'optionD',
+            choice_questions.choiceQuestionRightAnswer AS 'rightAnswer',
+            choice_questions.choiceQuestionAnalysis AS 'analysis'
+        FROM
+            `choice_questions`,questions_types,questions_difficulty
+        WHERE
+            choice_questions.questionsTypesID=questions_types.questionsTypesID
+          AND
+                choice_questions.questionsDifficultyID=questions_difficulty.questionsDifficultyID
+          AND
+            choice_questions.choiceQuestionsID=#{topicID}
+    </select>
+</mapper>
